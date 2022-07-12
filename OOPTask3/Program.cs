@@ -7,10 +7,8 @@ namespace OOPTask3
     {
         static void Main(string[] args)
         {
-            Database players = new Database();
+            Database dataBase = new Database();
             bool isRun = true;
-
-            CreatePlayers(players);
 
             while (isRun)
             {
@@ -20,19 +18,19 @@ namespace OOPTask3
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        players.ShowDatabase();
+                        dataBase.ShowTable();
                         break;
                     case "2":
-                        AddPlayer(players);
+                        dataBase.AddPlayer();
                         break;
                     case "3":
-                        SetBanPlayer(players, true);
+                        dataBase.BanPlayer();
                         break;
                     case "4":
-                        SetBanPlayer(players, false);
+                        dataBase.UnbanPlayer();
                         break;
                     case "5":
-                        DeletePlayer(players);
+                        dataBase.DeletePlayer();
                         break;
                     case "6":
                         isRun = false;
@@ -47,80 +45,18 @@ namespace OOPTask3
                 Console.Clear();
             }
         }
-
-        static private void CreatePlayers(Database players)
-        {
-            Random random = new Random();
-            string[] nickNames = { "Носок судьбы", "СвяТой_ТапоК", "3Jlou_4uTep", "KoTuk", "Высоковольтный Майонез" };
-            int maxLevel = 100;
-
-            for (int i = 0; i < nickNames.Length; i++)
-            {
-                Player player = new Player(nickNames[i], random.Next(maxLevel));
-                players.AddPlayer(player);
-            }
-        }
-
-        static void AddPlayer(Database players)
-        {
-            int level;
-
-            Console.Write("Введите ник игрока: ");
-            string nickName = Console.ReadLine();
-
-            Console.Write("Введите уровень игрока: ");
-
-            if (int.TryParse(Console.ReadLine(), out level) == false )
-            {
-                Console.WriteLine("Не корректное значение!");
-                return;
-            }
-
-            players.AddPlayer(new Player(nickName, level));
-        }
-
-        static void DeletePlayer(Database players)
-        {
-            int uniqueNumber;
-
-            Console.Write("Введите номер игрока которого нужно удалить: ");
-
-            if (int.TryParse(Console.ReadLine(), out uniqueNumber) == false)
-            {
-                Console.WriteLine("Не корректное значение!");
-                return;
-            }
-
-            players.DeletePlayer(uniqueNumber);
-        }
-
-        static void SetBanPlayer(Database players, bool ban)
-        {
-            int uniqueNumber;
-            string messageBan = ban ? "забанить" : "разбанить";
-
-            Console.Write($"Введите номер игрока которого нужно {messageBan}: ");
-
-            if (int.TryParse(Console.ReadLine(), out uniqueNumber) == false)
-            {
-                Console.WriteLine("Не корректное значение!");
-                return;
-            }
-
-            players.SetBan(uniqueNumber, ban);
-        }
     }
 
     class Player
     {
-        public int _uniqueNumber { get; private set; }
+        public int UniqueNumber { get; private set; }
         private string _nickName;
         private int _level;
         private bool _isBanned;
 
-        public Player(string nickName, int level)
+        public Player(string nickName, int level, int uniqueNumber)
         {
-            _uniqueNumber = 0;
+            UniqueNumber = uniqueNumber;
             _nickName = nickName;
             _level = level;
             _isBanned = false;
@@ -128,12 +64,7 @@ namespace OOPTask3
 
         public void ShowInfo()
         {
-            Console.WriteLine($"Игрок - {_nickName} , Уникальный номер - {_uniqueNumber} , Уровень - {_level} , Бан - {_isBanned}");
-        }
-
-        public void AssignUniqueNumber(int number)
-        {
-            _uniqueNumber = number;
+            Console.WriteLine($"Игрок - {_nickName} , Уникальный номер - {UniqueNumber} , Уровень - {_level} , Бан - {_isBanned}");
         }
 
         public void SetBan(bool banned)
@@ -144,49 +75,89 @@ namespace OOPTask3
 
     class Database
     {
-        private int _index;
+        private int _indexNextPlayer;
         private List<Player> _players;
 
         public Database()
         {
-            _index = 0;
+            _indexNextPlayer = 0;
             _players = new List<Player>();
+            Random random = new Random();
+            string[] nickNames = { "Носок судьбы", "СвяТой_ТапоК", "3Jlou_4uTep", "KoTuk", "Высоковольтный Майонез" };
+            int maxLevel = 100;
+
+            for (int i = 0; i < nickNames.Length; i++)
+            {
+                _indexNextPlayer++;
+                _players.Add(new Player(nickNames[i], random.Next(maxLevel), _indexNextPlayer));
+            }
         }
 
-        public void AddPlayer(Player player)
+        public void AddPlayer()
         {
-            _index++;
-            _players.Add(player);
-            player.AssignUniqueNumber(_index);
+            Console.Write("Введите ник игрока: ");
+            string nickName = Console.ReadLine();
+
+            Console.Write("Введите уровень игрока: ");
+            int level = GetNuberFromUser();
+
+            _indexNextPlayer++;
+            _players.Add(new Player(nickName, level, _indexNextPlayer));
+            Console.WriteLine("Игрок добавлен");
         }
 
-        public void DeletePlayer(int uniqueNumber)
+        public void DeletePlayer()
         {
+            Console.Write("Введите номер игрока которого нужно удалить: ");
+            int uniqueNumber = GetNuberFromUser();
+
             var player = GetPlayer(uniqueNumber);
-            if (_players.Contains(player))
+            if (player != null)
             {
                 _players.Remove(player);
+                Console.WriteLine("Игрок удален!");
             }
             else
             {
-                Console.WriteLine("Угрок не найден!");
+                Console.WriteLine("Игрок не найден!");
             }
         }
 
-        public void SetBan(int uniqueNumber, bool ban)
+        public void BanPlayer()
         {
-            var player = GetPlayer(uniqueNumber);
-            if (_players.Contains(player))
+            Console.Write("Введите номер игрока которого нужно забанить: ");
+            int uniqueNumber = GetNuberFromUser();
+
+            Player player = GetPlayer(uniqueNumber);
+            if (player != null)
             {
-                player.SetBan(ban);
+                player.SetBan(true);
+                Console.WriteLine($"Игрок забанен!");
             }
             else
             {
-                Console.WriteLine("Угрок не найден!");
+                Console.WriteLine("Игрок не найден!");
             }
         }
 
-        public void ShowDatabase()
+        public void UnbanPlayer()
+        {
+            Console.Write("Введите номер игрока которого нужно разбанить: ");
+            int uniqueNumber = GetNuberFromUser();
+
+            Player player = GetPlayer(uniqueNumber);
+            if (player != null)
+            {
+                player.SetBan(false);
+                Console.WriteLine($"Игрок разбанен!");
+            }
+            else
+            {
+                Console.WriteLine("Игрок не найден!");
+            }
+        }
+
+        public void ShowTable()
         {
             foreach (var player in _players)
             {
@@ -198,13 +169,25 @@ namespace OOPTask3
         {
             foreach (var player in _players)
             {
-                if (player._uniqueNumber == uniqueNumber)
+                if (player.UniqueNumber == uniqueNumber)
                 {
                     return player;
                 }
             }
 
             return null;
+        }
+
+        private int GetNuberFromUser()
+        {
+            int uniqueNumber;
+
+            if (int.TryParse(Console.ReadLine(), out uniqueNumber) == false)
+            {
+                Console.WriteLine("Не корректное значение!");
+            }
+
+            return uniqueNumber;
         }
     }
 }
