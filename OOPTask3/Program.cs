@@ -68,12 +68,12 @@ namespace OOPTask3
             Console.WriteLine($"Игрок - {_nickName} , Уникальный номер - {UniqueNumber} , Уровень - {_level} , Бан - {_isBanned}");
         }
 
-        public void BanPlayer()
+        public void Ban()
         {
             _isBanned = true;
         }
 
-        public void UnbanPlayer()
+        public void Unban()
         {
             _isBanned = false;
         }
@@ -137,7 +137,7 @@ namespace OOPTask3
             Player player = GetPlayer(uniqueNumber);
             if (player != null)
             {
-                player.BanPlayer();
+                player.Ban();
                 Console.WriteLine($"Игрок забанен!");
             }
             else
@@ -154,7 +154,7 @@ namespace OOPTask3
             Player player = GetPlayer(uniqueNumber);
             if (player != null)
             {
-                player.UnbanPlayer();
+                player.Unban();
                 Console.WriteLine($"Игрок разбанен!");
             }
             else
