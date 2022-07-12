@@ -49,10 +49,11 @@ namespace OOPTask3
 
     class Player
     {
-        public int UniqueNumber { get; private set; }
         private string _nickName;
         private int _level;
         private bool _isBanned;
+
+        public int UniqueNumber { get; private set; }
 
         public Player(string nickName, int level, int uniqueNumber)
         {
@@ -67,9 +68,14 @@ namespace OOPTask3
             Console.WriteLine($"Игрок - {_nickName} , Уникальный номер - {UniqueNumber} , Уровень - {_level} , Бан - {_isBanned}");
         }
 
-        public void SetBan(bool banned)
+        public void BanPlayer()
         {
-            _isBanned = banned;
+            _isBanned = true;
+        }
+
+        public void UnbanPlayer()
+        {
+            _isBanned = false;
         }
     }
 
@@ -131,7 +137,7 @@ namespace OOPTask3
             Player player = GetPlayer(uniqueNumber);
             if (player != null)
             {
-                player.SetBan(true);
+                player.BanPlayer();
                 Console.WriteLine($"Игрок забанен!");
             }
             else
@@ -148,7 +154,7 @@ namespace OOPTask3
             Player player = GetPlayer(uniqueNumber);
             if (player != null)
             {
-                player.SetBan(false);
+                player.UnbanPlayer();
                 Console.WriteLine($"Игрок разбанен!");
             }
             else
